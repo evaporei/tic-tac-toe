@@ -20,6 +20,13 @@ function grid:__tostring()
     g = g .. ']'
     return g
 end
+function grid:reset()
+    for i = 1, #self do
+        for j = 1, #self[i] do
+            self[i][j] = 'empty'
+        end
+    end
+end
 
 local curr = 'x'
 
@@ -48,6 +55,41 @@ function love.mousepressed(x, y, button, _, _)
     if debug then
         print(tostring(grid))
     end
+end
+
+local function allSame(list)
+    local first = list[1]
+    for i = 1, #list do
+        if list[i] ~= first or list[i] == 'empty' then
+            return false
+        end
+    end
+    return true
+end
+
+local function gameOver()
+    -- xxx or ooo in row
+    for i = 1, #grid do
+        if allSame(grid[i]) then
+            return true
+        end
+    end
+    -- xxx or ooo in column
+    for i = 1, #grid do
+        local list = {}
+        for j = 1, #grid[i] do
+            table.insert(list, grid[j][i])
+        end
+        if allSame(list) then
+            return true
+        end
+    end
+    -- \ or /
+    if allSame({ grid[1][1], grid[2][2], grid[3][3] }) or
+       allSame({ grid[3][1], grid[2][2], grid[1][3] }) then
+        return true
+    end
+    return false
 end
 
 function love.draw()
@@ -92,5 +134,12 @@ function love.draw()
                 )
             end
         end
+    end
+
+    if gameOver() then
+        if debug then
+            print('game over')
+        end
+        grid:reset()
     end
 end
