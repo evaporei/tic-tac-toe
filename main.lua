@@ -1,3 +1,5 @@
+local debug = false
+
 local player = nil
 
 local grid = {
@@ -43,8 +45,9 @@ function love.mousepressed(x, y, button, _, _)
     end
 
     player = { x = x, y = y }
-    -- debug
-    print(tostring(grid))
+    if debug then
+        print(tostring(grid))
+    end
 end
 
 function love.draw()
@@ -62,6 +65,8 @@ function love.draw()
     love.graphics.line(offset, thirdHeight, wwidth - offset, thirdHeight)
     love.graphics.line(offset, thirdHeight * 2, wwidth - offset, thirdHeight * 2)
 
+    -- this could be on love.update, but I left here
+    -- since we're dealing with screen size anyway
     if player then
         local j, i = math.floor(player.x / thirdWidth), math.floor(player.y / thirdHeight)
         grid[i + 1][j + 1] = curr
@@ -71,9 +76,20 @@ function love.draw()
 
     for i = 1, #grid do
         for j = 1, #grid[i] do
-            if grid[i][j] ~= 'empty' then
+            if grid[i][j] == 'o' then
                 local radius = thirdWidth / 2 - offset * 2
                 love.graphics.circle('line', (j - 1) * thirdWidth + thirdWidth / 2, (i - 1) * thirdHeight + thirdHeight / 2, radius)
+            elseif grid[i][j] == 'x' then
+                -- \
+                love.graphics.line(
+                    (j - 1) * thirdWidth + thirdWidth / 4, (i - 1) * thirdHeight + thirdHeight / 4,
+                    (j - 1) * thirdWidth + thirdWidth / 4 * 3, (i - 1) * thirdHeight + thirdHeight / 4 * 3
+                )
+                -- /
+                love.graphics.line(
+                    (j - 1) * thirdWidth + thirdWidth / 4 * 3, (i - 1) * thirdHeight + thirdHeight / 4,
+                    (j - 1) * thirdWidth + thirdWidth / 4, (i - 1) * thirdHeight + thirdHeight / 4 * 3
+                )
             end
         end
     end
