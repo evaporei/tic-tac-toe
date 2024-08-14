@@ -1,5 +1,26 @@
 local player = nil
 
+local grid = {
+    { 'empty', 'empty', 'empty' },
+    { 'empty', 'empty', 'empty' },
+    { 'empty', 'empty', 'empty' },
+}
+setmetatable(grid, grid)
+function grid:__tostring()
+    local g = '[\n'
+    for i = 1, #self do
+        g = g .. '['
+        for j = 1, #self[i] do
+            g = g .. self[i][j] .. ','
+        end
+        g = g .. ']\n'
+    end
+    g = g .. ']'
+    return g
+end
+
+local curr = 'x'
+
 function love.load()
     love.window.setTitle('tic tac toe')
 
@@ -22,6 +43,8 @@ function love.mousepressed(x, y, button, _, _)
     end
 
     player = { x = x, y = y }
+    -- debug
+    print(tostring(grid))
 end
 
 function love.draw()
@@ -40,8 +63,18 @@ function love.draw()
     love.graphics.line(offset, thirdHeight * 2, wwidth - offset, thirdHeight * 2)
 
     if player then
-        local x, y = math.floor(player.x / thirdWidth), math.floor(player.y / thirdHeight)
-        local radius = thirdWidth / 2 - offset * 2
-        love.graphics.circle('line', x * thirdWidth + thirdWidth / 2, y * thirdHeight + thirdHeight / 2, radius)
+        local j, i = math.floor(player.x / thirdWidth), math.floor(player.y / thirdHeight)
+        grid[i + 1][j + 1] = curr
+        curr = curr == 'x' and 'o' or 'x'
+        player = nil
+    end
+
+    for i = 1, #grid do
+        for j = 1, #grid[i] do
+            if grid[i][j] ~= 'empty' then
+                local radius = thirdWidth / 2 - offset * 2
+                love.graphics.circle('line', (j - 1) * thirdWidth + thirdWidth / 2, (i - 1) * thirdHeight + thirdHeight / 2, radius)
+            end
+        end
     end
 end
